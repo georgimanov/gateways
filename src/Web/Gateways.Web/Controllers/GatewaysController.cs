@@ -49,7 +49,7 @@
         {
             var gateway = AutoMapperConfig.MapperInstance.Map<GatewayInputModel, Gateway>(model);
 
-            var result = await this.gatewaysService.Create(gateway);
+            var result = await this.gatewaysService.CreateAsync(gateway);
 
             if (result.HasError)
             {
@@ -77,7 +77,7 @@
 
             AutoMapperConfig.MapperInstance.Map<GatewayEditModel, Gateway>(model, gateway);
 
-            var result = await this.gatewaysService.Update(gateway);
+            var result = await this.gatewaysService.UpdateAsync(gateway);
 
             if (result.HasError)
             {
@@ -96,7 +96,11 @@
                 return this.NotFound();
             }
 
-            await this.gatewaysService.Delete(gateway);
+            var result = await this.gatewaysService.DeleteAsync(gateway);
+            if (result.HasError)
+            {
+                return this.BadRequest(new { Error = result.ErrorMessage });
+            }
 
             return this.NoContent();
         }

@@ -16,11 +16,11 @@
 
         public Gateway GetAsNoTracking(Guid id);
 
-        Task<ServiceResult> Create(Gateway gateway);
+        Task<ServiceResult> CreateAsync(Gateway gateway);
 
-        Task<ServiceResult> Update(Gateway gateway);
+        Task<ServiceResult> UpdateAsync(Gateway gateway);
 
-        Task Delete(Gateway gateway);
+        Task<ServiceResult> DeleteAsync(Gateway gateway);
 
         Task<ServiceResult> AddDeviceAsync(Gateway gateway, PeripheralDevice device);
 

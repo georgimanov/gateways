@@ -36,7 +36,7 @@
             return this.gatewaysRepository.AllAsNoTracking().FirstOrDefault(x => x.Id == id);
         }
 
-        public async Task<ServiceResult> Create(Gateway gateway)
+        public async Task<ServiceResult> CreateAsync(Gateway gateway)
         {
             var entry = this.gatewaysRepository.AllAsNoTrackingWithDeleted().FirstOrDefault(x => x.SerialNumber == gateway.SerialNumber);
             if (entry != null)
@@ -50,7 +50,7 @@
             return new ServiceResult();
         }
 
-        public async Task<ServiceResult> Update(Gateway gateway)
+        public async Task<ServiceResult> UpdateAsync(Gateway gateway)
         {
             var entry = this.gatewaysRepository.AllAsNoTrackingWithDeleted().FirstOrDefault(x => x.SerialNumber == gateway.SerialNumber);
             if (entry != null)
@@ -64,10 +64,18 @@
             return new ServiceResult();
         }
 
-        public async Task Delete(Gateway gateway)
+        public async Task<ServiceResult> DeleteAsync(Gateway gateway)
         {
+            var hasDevices = this.peripheralDevicesRepository.AllAsNoTrackingWithDeleted().Any(x => x.GatewayId == gateway.Id);
+            if (hasDevices)
+            {
+                return new ServiceResult { ErrorMessage = $"Gateway has assigned peripheral devices." };
+            }
+
             this.gatewaysRepository.HardDelete(gateway);
             await this.gatewaysRepository.SaveChangesAsync();
+
+            return new ServiceResult();
         }
 
         public async Task<ServiceResult> AddDeviceAsync(Gateway gateway, PeripheralDevice device)
