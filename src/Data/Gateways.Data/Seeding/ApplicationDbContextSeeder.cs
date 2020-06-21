@@ -27,6 +27,8 @@
                           {
                               new RolesSeeder(),
                               new SettingsSeeder(),
+                              new GatewaysSeeder(),
+                              new DevicesSeeder(),
                           };
 
             foreach (var seeder in seeders)
