@@ -4,7 +4,7 @@
 
     using Gateways.Data.Common.Models;
 
-    public class PeripheralDevice : BaseModel<Guid>
+    public class PeripheralDevice : BaseDeletableModel<Guid>
     {
         public int UID { get; set; }
 

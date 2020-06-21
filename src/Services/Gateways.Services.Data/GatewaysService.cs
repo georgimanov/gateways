@@ -8,7 +8,6 @@
     using Gateways.Data.Common.Repositories;
     using Gateways.Data.Models;
     using Gateways.Services.Mapping;
-    using Gateways.Web.ViewModels.Devices;
 
     public class GatewaysService : IGatewaysService
     {
@@ -27,6 +26,38 @@
         public Task<Gateway> GetAsync(Guid id)
         {
             return this.gatewaysRepository.GetByIdWithDeletedAsync(id);
+        }
+
+        public async Task Create(Gateway gateway)
+        {
+            await this.gatewaysRepository.AddAsync(gateway);
+            await this.gatewaysRepository.SaveChangesAsync();
+        }
+
+        public async Task Update(Gateway gateway)
+        {
+            this.gatewaysRepository.Update(gateway);
+            await this.gatewaysRepository.SaveChangesAsync();
+        }
+
+        public async Task Delete(Gateway gateway)
+        {
+            this.gatewaysRepository.Delete(gateway);
+            await this.gatewaysRepository.SaveChangesAsync();
+        }
+
+        public async Task AddDeviceAsync(Gateway gateway, PeripheralDevice device)
+        {
+            gateway.PeripheralDevices.Add(device);
+
+            await this.Update(gateway);
+        }
+
+        public async Task RemoveDeviceAsync(Gateway gateway, PeripheralDevice device)
+        {
+            gateway.PeripheralDevices.Remove(device);
+
+            await this.Update(gateway);
         }
     }
 }
