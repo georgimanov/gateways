@@ -20,4 +20,4 @@ jobs:
     - name: Build
       run: dotnet build src/Gateways.sln --configuration Release --no-restore
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet test src/Gateways.sln --no-restore --verbosity normal
