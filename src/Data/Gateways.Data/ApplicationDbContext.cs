@@ -26,6 +26,10 @@
 
         public DbSet<Setting> Settings { get; set; }
 
+        public DbSet<Gateway> Gateways { get; set; }
+
+        public DbSet<PeripheralDevice> PeripheralDevices { get; set; }
+
         public override int SaveChanges() => this.SaveChanges(true);
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
@@ -49,6 +53,8 @@
         {
             // Needed for Identity models configuration
             base.OnModelCreating(builder);
+
+            builder.Entity<Gateway>(gateway => { gateway.HasIndex(g => g.SerialNumber).IsUnique(unique: true); });
 
             this.ConfigureUserIdentityRelations(builder);
 

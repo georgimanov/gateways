@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Gateways.Common\Gateways.Common.csproj" />
     <ProjectReference Include="..\Gateways.Data.Common\Gateways.Data.Common.csproj" />
   </ItemGroup>
   
