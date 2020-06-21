@@ -1,7 +1,7 @@
 # Gateways
 
 # Build status
-![](https://github.com/georgimanov/gateways/workflows/.github/workflows/dotnet-core.yml/badge.svg)
+![.NET Core](https://github.com/georgimanov/gateways/workflows/.NET%20Core/badge.svg?branch=master)
 
 ## Authors
 
