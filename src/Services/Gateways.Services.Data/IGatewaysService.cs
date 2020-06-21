@@ -22,7 +22,7 @@
 
         Task Delete(Gateway gateway);
 
-        Task AddDeviceAsync(Gateway gateway, PeripheralDevice device);
+        Task<ServiceResult> AddDeviceAsync(Gateway gateway, PeripheralDevice device);
 
         Task RemoveDeviceAsync(Gateway gateway, PeripheralDevice device);
     }

@@ -2,22 +2,23 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Common;
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Gateways.Common;
     using Gateways.Data.Common.Repositories;
     using Gateways.Data.Models;
     using Gateways.Services.Mapping;
-    using Microsoft.EntityFrameworkCore;
 
     public class GatewaysService : IGatewaysService
     {
         private readonly IDeletableEntityRepository<Gateway> gatewaysRepository;
+        private readonly IDeletableEntityRepository<PeripheralDevice> peripheralDevicesRepository;
 
-        public GatewaysService(IDeletableEntityRepository<Gateway> gatewaysRepository)
+        public GatewaysService(IDeletableEntityRepository<Gateway> gatewaysRepository, IDeletableEntityRepository<PeripheralDevice> peripheralDevicesRepository)
         {
             this.gatewaysRepository = gatewaysRepository;
+            this.peripheralDevicesRepository = peripheralDevicesRepository;
         }
 
         public IEnumerable<T> GetAll<T>()
@@ -69,18 +70,31 @@
             await this.gatewaysRepository.SaveChangesAsync();
         }
 
-        public async Task AddDeviceAsync(Gateway gateway, PeripheralDevice device)
+        public async Task<ServiceResult> AddDeviceAsync(Gateway gateway, PeripheralDevice device)
         {
-            gateway.PeripheralDevices.Add(device);
+            var count = this.peripheralDevicesRepository.AllAsNoTrackingWithDeleted().Count(x => x.GatewayId == gateway.Id);
 
-            await this.Update(gateway);
+            if (count < GlobalConstants.GatewayMaxPeripheralDevicesCount)
+            {
+                gateway.PeripheralDevices.Add(device);
+
+                device.GatewayId = gateway.Id;
+                this.peripheralDevicesRepository.Update(device);
+                await this.peripheralDevicesRepository.SaveChangesAsync();
+
+                return new ServiceResult();
+            }
+
+            return new ServiceResult() { ErrorMessage = $"Gateway max peripheral devices count of {GlobalConstants.GatewayMaxPeripheralDevicesCount} is reached." };
         }
 
         public async Task RemoveDeviceAsync(Gateway gateway, PeripheralDevice device)
         {
             gateway.PeripheralDevices.Remove(device);
 
-            await this.Update(gateway);
+            device.GatewayId = null;
+            this.peripheralDevicesRepository.Update(device);
+            await this.peripheralDevicesRepository.SaveChangesAsync();
         }
 
         public int GetCount()

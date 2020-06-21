@@ -20,16 +20,17 @@
         [Fact]
         public void GetCountShouldReturnCorrectNumber()
         {
-            var repository = new Mock<IDeletableEntityRepository<Gateway>>();
-            repository.Setup(r => r.AllAsNoTracking()).Returns(new List<Gateway>
+            var gatewaysRepository = new Mock<IDeletableEntityRepository<Gateway>>();
+            var peripheralDevicesRepository = new Mock<IDeletableEntityRepository<PeripheralDevice>>();
+            gatewaysRepository.Setup(r => r.AllAsNoTracking()).Returns(new List<Gateway>
                                                         {
                                                             new Gateway(),
                                                             new Gateway(),
                                                             new Gateway(),
                                                         }.AsQueryable());
-            var service = new GatewaysService(repository.Object);
+            var service = new GatewaysService(gatewaysRepository.Object, peripheralDevicesRepository.Object);
             Assert.Equal(3, service.GetCount());
-            repository.Verify(x => x.AllAsNoTracking(), Times.Once);
+            gatewaysRepository.Verify(x => x.AllAsNoTracking(), Times.Once);
         }
 
         [Fact]
@@ -43,8 +44,9 @@
             dbContext.Gateways.Add(new Gateway());
             await dbContext.SaveChangesAsync();
 
-            using var repository = new EfDeletableEntityRepository<Gateway>(dbContext);
-            var service = new GatewaysService(repository);
+            using var gatewaysRepository = new EfDeletableEntityRepository<Gateway>(dbContext);
+            using var peripheralDevicesRepository = new EfDeletableEntityRepository<PeripheralDevice>(dbContext);
+            var service = new GatewaysService(gatewaysRepository, peripheralDevicesRepository);
             Assert.Equal(3, service.GetCount());
         }
     }

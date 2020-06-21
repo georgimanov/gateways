@@ -101,27 +101,31 @@
             return this.NoContent();
         }
 
-        [HttpPost("{id}/devices")]
+        [HttpPost("{id}/devices/{deviceId}")]
         public async Task<IActionResult> Add(Guid id, Guid deviceId)
         {
             var gateway = await this.gatewaysService.GetAsync(id);
             if (gateway == null)
             {
-                return this.NotFound(new { id });
+                return this.NotFound(new { Error = "Gateway not found" });
             }
 
             var device = await this.peripheralDevicesService.GetAsync(deviceId);
             if (device == null)
             {
-                return this.NotFound(new { deviceId });
+                return this.NotFound(new { Error = "Peripheral device not found" });
             }
 
-            await this.gatewaysService.AddDeviceAsync(gateway, device);
+            var result = await this.gatewaysService.AddDeviceAsync(gateway, device);
+            if (result.HasError)
+            {
+                return this.BadRequest(new { Error = result.ErrorMessage });
+            }
 
             return this.NoContent();
         }
 
-        [HttpDelete("{id}/devices")]
+        [HttpDelete("{id}/devices/{deviceId}")]
         public async Task<IActionResult> Delete(Guid id, Guid deviceId)
         {
             var gateway = await this.gatewaysService.GetAsync(id);

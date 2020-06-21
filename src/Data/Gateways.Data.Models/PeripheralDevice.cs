@@ -13,5 +13,7 @@
         public DateTime DateOfCreation { get; set; }
 
         public DeviseStatus Status { get; set; }
+
+        public Guid? GatewayId { get; set; }
     }
 }
