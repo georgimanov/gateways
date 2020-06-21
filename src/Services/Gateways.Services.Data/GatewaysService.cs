@@ -2,12 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data.Common;
     using System.Linq;
     using System.Threading.Tasks;
 
     using Gateways.Data.Common.Repositories;
     using Gateways.Data.Models;
     using Gateways.Services.Mapping;
+    using Microsoft.EntityFrameworkCore;
 
     public class GatewaysService : IGatewaysService
     {
@@ -28,21 +30,42 @@
             return this.gatewaysRepository.GetByIdWithDeletedAsync(id);
         }
 
-        public async Task Create(Gateway gateway)
+        public Gateway GetAsNoTracking(Guid id)
         {
-            await this.gatewaysRepository.AddAsync(gateway);
-            await this.gatewaysRepository.SaveChangesAsync();
+            return this.gatewaysRepository.AllAsNoTracking().FirstOrDefault(x => x.Id == id);
         }
 
-        public async Task Update(Gateway gateway)
+        public async Task<ServiceResult> Create(Gateway gateway)
         {
+            var entry = this.gatewaysRepository.AllAsNoTrackingWithDeleted().FirstOrDefault(x => x.SerialNumber == gateway.SerialNumber);
+            if (entry != null)
+            {
+                return new ServiceResult { ErrorMessage = $"Entry with SN {gateway.SerialNumber} already exists." };
+            }
+
+            await this.gatewaysRepository.AddAsync(gateway);
+            await this.gatewaysRepository.SaveChangesAsync();
+
+            return new ServiceResult();
+        }
+
+        public async Task<ServiceResult> Update(Gateway gateway)
+        {
+            var entry = this.gatewaysRepository.AllAsNoTrackingWithDeleted().FirstOrDefault(x => x.SerialNumber == gateway.SerialNumber);
+            if (entry != null)
+            {
+                return new ServiceResult { ErrorMessage = $"Entry with SN {gateway.SerialNumber} already exists." };
+            }
+
             this.gatewaysRepository.Update(gateway);
             await this.gatewaysRepository.SaveChangesAsync();
+
+            return new ServiceResult();
         }
 
         public async Task Delete(Gateway gateway)
         {
-            this.gatewaysRepository.Delete(gateway);
+            this.gatewaysRepository.HardDelete(gateway);
             await this.gatewaysRepository.SaveChangesAsync();
         }
 
@@ -58,6 +81,11 @@
             gateway.PeripheralDevices.Remove(device);
 
             await this.Update(gateway);
+        }
+
+        public int GetCount()
+        {
+            return this.gatewaysRepository.AllAsNoTracking().Count();
         }
     }
 }

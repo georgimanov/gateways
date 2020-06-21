@@ -10,9 +10,7 @@
 
     using Microsoft.AspNetCore.Mvc;
 
-    [ApiController]
-    [Route("api/Gateways")]
-    public class GatewaysController : BaseController
+    public class GatewaysController : BaseApiController
     {
         private readonly IGatewaysService gatewaysService;
         private readonly IPeripheralDevicesService peripheralDevicesService;
@@ -32,9 +30,9 @@
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetGateway(Guid id)
+        public IActionResult GetGateway(Guid id)
         {
-            var gateway = await this.gatewaysService.GetAsync(id);
+            var gateway = this.gatewaysService.GetAsNoTracking(id);
 
             if (gateway == null)
             {
@@ -47,11 +45,16 @@
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody]GatewayInputModel model)
+        public async Task<IActionResult> Create(GatewayInputModel model)
         {
             var gateway = AutoMapperConfig.MapperInstance.Map<GatewayInputModel, Gateway>(model);
 
-            await this.gatewaysService.Create(gateway);
+            var result = await this.gatewaysService.Create(gateway);
+
+            if (result.HasError)
+            {
+                return this.BadRequest(new { Error = result.ErrorMessage });
+            }
 
             var viewModel = AutoMapperConfig.MapperInstance.Map<Gateway, GatewayViewModel>(gateway);
 
@@ -72,9 +75,14 @@
                 return this.NotFound();
             }
 
-            var gatewayToEdit = AutoMapperConfig.MapperInstance.Map<GatewayEditModel, Gateway>(model);
+            AutoMapperConfig.MapperInstance.Map<GatewayEditModel, Gateway>(model, gateway);
 
-            await this.gatewaysService.Update(gatewayToEdit);
+            var result = await this.gatewaysService.Update(gateway);
+
+            if (result.HasError)
+            {
+                return this.BadRequest(new { Error = result.ErrorMessage });
+            }
 
             return this.NoContent();
         }

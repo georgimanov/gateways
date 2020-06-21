@@ -8,13 +8,17 @@
 
     public interface IGatewaysService
     {
+        int GetCount();
+
         IEnumerable<T> GetAll<T>();
 
         public Task<Gateway> GetAsync(Guid id);
 
-        Task Create(Gateway gateway);
+        public Gateway GetAsNoTracking(Guid id);
 
-        Task Update(Gateway gateway);
+        Task<ServiceResult> Create(Gateway gateway);
+
+        Task<ServiceResult> Update(Gateway gateway);
 
         Task Delete(Gateway gateway);
 

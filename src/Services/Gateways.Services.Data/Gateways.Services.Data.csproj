@@ -23,6 +23,7 @@
     <ProjectReference Include="..\..\Data\Gateways.Data.Models\Gateways.Data.Models.csproj" />
     <ProjectReference Include="..\..\Web\Gateways.Web.ViewModels\Gateways.Web.ViewModels.csproj" />
     <ProjectReference Include="..\Gateways.Services.Mapping\Gateways.Services.Mapping.csproj" />
+    <ProjectReference Include="..\Gateways.Services\Gateways.Services.csproj" />
   </ItemGroup>
 
 </Project>
